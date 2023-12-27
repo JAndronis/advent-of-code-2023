@@ -9,6 +9,8 @@
 #include <fstream>
 #include <filesystem>
 #include <string>
+#include <numeric>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 fs::path file_path = __FILE__;
@@ -48,8 +50,22 @@ namespace trebuchet {
     }
 
     std::string digitStringFromNames(const std::string& line) {
-        std::string number_string;
-
+        std::string number_string(line.size(), 'x');
+        int counter = 0;
+        for (const char &i: line) {
+            if (trebuchet::isDigit(i)) {
+                number_string[counter] = i;
+            }
+            counter++;
+        }
+        for (const auto& [key, value]: trebuchet::number_names) {
+            size_t pos = line.find(key, 0);
+            while (pos != std::string::npos) {
+                number_string[pos] = std::to_string(value)[0];
+                pos = line.find(key, pos + 1);
+            }
+        }
+        number_string.erase(std::remove(number_string.begin(), number_string.end(), 'x'), number_string.end());
         return number_string;
     }
 }
